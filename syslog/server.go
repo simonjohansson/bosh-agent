@@ -5,6 +5,7 @@ import (
 	"net"
 	"strconv"
 	"sync"
+	"fmt"
 
 	"github.com/jeromer/syslogparser/rfc3164"
 
@@ -68,6 +69,8 @@ func (s *concreteServer) handleConnection(conn net.Conn, callback CallbackFunc) 
 
 	for scanner.Scan() {
 		bytes := scanner.Bytes()
+
+		fmt.Printf("Server Received: %s\n", string(bytes))
 
 		p := rfc3164.NewParser(bytes)
 

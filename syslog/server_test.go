@@ -69,6 +69,7 @@ var _ = Describe("Server", func() {
 
 	BeforeEach(func() {
 		serverPort = grabEphemeralPort()
+		fmt.Printf("Server Port: %d\n", serverPort)
 		logger = boshlog.NewLogger(boshlog.LevelNone)
 		server = NewServer(serverPort, logger)
 		msgs = msgCollector{}
@@ -172,6 +173,9 @@ var _ = Describe("Server", func() {
 
 		err = server.Stop()
 		Expect(err).ToNot(HaveOccurred())
+
+		fmt.Printf("Log Writer Out: %s\n", string(outBuf.Bytes()))
+		fmt.Printf("Log Writer Err: %s\n", string(errBuf.Bytes()))
 
 		Expect(string(errBuf.Bytes())).To(
 			ContainSubstring("Failed to parse syslog message"))
