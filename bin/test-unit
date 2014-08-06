@@ -21,7 +21,7 @@ $bin/go install github.com/onsi/ginkgo/ginkgo
 let "result+=$?"
 
 echo -e "\n Testing packages..."
-GOMAXPROCS=2 $bin/env ginkgo -r $race $bin/..
+GOMAXPROCS=3 $bin/env ginkgo -r $race $bin/..
 let "result+=$?"
 
 if [ ! $QUIET ]; then
