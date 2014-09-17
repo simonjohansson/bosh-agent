@@ -654,8 +654,10 @@ func (p linux) MigratePersistentDisk(fromMountPoint, toMountPoint string) (err e
 }
 
 func (p linux) IsPersistentDiskMounted(path string) (bool, error) {
+	p.logger.Debug(logTag, "Checking whether persistent disk %s is mounted", path)
 	realPath, timedOut, err := p.devicePathResolver.GetRealDevicePath(path)
 	if timedOut {
+		p.logger.Debug(logTag, "Timed out resolving device path %s, ignoring", path)
 		return false, nil
 	}
 	if err != nil {
