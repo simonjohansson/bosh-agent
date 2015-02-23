@@ -35,15 +35,21 @@ func (p sfdiskPartitioner) Partition(devicePath string, partitions []Partition) 
 	}
 
 	sfdiskInput := ""
+	lastEndSector := uint64(0)
 	for index, partition := range partitions {
 		sfdiskPartitionType := sfdiskPartitionTypes[partition.Type]
-		partitionSize := fmt.Sprintf("%d", p.convertFromBytesToMb(partition.SizeInBytes))
 
+		startSector := calculateStartSector(lastEndSector)
+		sectorSize := p.convertFromBytesToSectors(partition.SizeInBytes)
+
+		startSectorString := fmt.Sprintf("%d", startSector)
+		sectorSizeString := fmt.Sprintf("%d", sectorSize)
 		if index == len(partitions)-1 {
-			partitionSize = ""
+			sectorSizeString = ""
 		}
 
-		sfdiskInput = sfdiskInput + fmt.Sprintf(",%s,%s\n", partitionSize, sfdiskPartitionType)
+		sfdiskInput = sfdiskInput + fmt.Sprintf("%s,%s,%s\n", startSectorString, sectorSizeString, sfdiskPartitionType)
+		lastEndSector = startSector + sectorSize
 	}
 	p.logger.Info(p.logTag, "Partitioning %s with %s", devicePath, sfdiskInput)
 
@@ -156,10 +162,29 @@ func (p sfdiskPartitioner) convertFromBytesToMb(sizeInBytes uint64) uint64 {
 	return sizeInBytes / (1024 * 1024)
 }
 
+func (p sfdiskPartitioner) convertFromBytesToSectors(sizeInBytes uint64) uint64 {
+	return sizeInBytes / 512
+}
+
 func (p sfdiskPartitioner) convertFromMbToBytes(sizeInMb uint64) uint64 {
 	return sizeInMb * 1024 * 1024
 }
 
 func (p sfdiskPartitioner) convertFromKbToBytes(sizeInKb uint64) uint64 {
 	return sizeInKb * 1024
+}
+
+func calculateStartSector(start uint64) uint64 {
+	/*
+		We always want to add 64 sectors in the start to make sure that we dont overlap with a previous partition, and that the first partition always start on 64.
+	*/
+	start += 64
+	for {
+		if (start*512)%4096 == 0 {
+			break
+		}
+		start += 1
+	}
+
+	return start
 }
