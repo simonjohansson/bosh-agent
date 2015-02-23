@@ -68,7 +68,7 @@ var _ = Describe("sfdiskPartitioner", func() {
 		partitioner.Partition("/dev/sda", partitions)
 
 		Expect(1).To(Equal(len(runner.RunCommandsWithInput)))
-		Expect(runner.RunCommandsWithInput[0]).To(Equal([]string{",512,S\n,1024,L\n,,L\n", "sfdisk", "-uM", "/dev/sda"}))
+		Expect(runner.RunCommandsWithInput[0]).To(Equal([]string{"64,1048576,S\n1048704,2097152,L\n3145920,,L\n", "sfdisk", "-uS", "/dev/sda"}))
 	})
 
 	It("sfdisk partition with no partition table", func() {
@@ -83,7 +83,7 @@ var _ = Describe("sfdiskPartitioner", func() {
 		partitioner.Partition("/dev/sda", partitions)
 
 		Expect(1).To(Equal(len(runner.RunCommandsWithInput)))
-		Expect(runner.RunCommandsWithInput[0]).To(Equal([]string{",512,S\n,1024,L\n,,L\n", "sfdisk", "-uM", "/dev/sda"}))
+		Expect(runner.RunCommandsWithInput[0]).To(Equal([]string{"64,1048576,S\n1048704,2097152,L\n3145920,,L\n", "sfdisk", "-uS", "/dev/sda"}))
 	})
 
 	It("sfdisk get device size in mb", func() {
@@ -127,7 +127,7 @@ var _ = Describe("sfdiskPartitioner", func() {
 		partitioner.Partition("/dev/sda", partitions)
 
 		Expect(len(runner.RunCommandsWithInput)).To(Equal(1))
-		Expect(runner.RunCommandsWithInput[0]).To(Equal([]string{",1024,L\n,,L\n", "sfdisk", "-uM", "/dev/sda"}))
+		Expect(runner.RunCommandsWithInput[0]).To(Equal([]string{"64,2097152,L\n2097280,,L\n", "sfdisk", "-uS", "/dev/sda"}))
 	})
 
 	It("sfdisk partition with last partition filling disk", func() {
